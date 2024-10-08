@@ -1,0 +1,41 @@
+-- quick tutorial on how to use this
+
+-- 1. open roblox studio
+
+-- 2. create a Script in ServerScriptService
+
+-- 3. paste the script below
+----------------------------
+
+local Players = game:GetService("Players")
+
+local function onCharacterAdded(character, player)
+    coroutine.wrap(function()
+        player.CharacterAppearanceId = player.UserId
+
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+        if humanoid then
+            local success, desc = pcall(function()
+                return Players:GetHumanoidDescriptionFromUserId(player.UserId)
+            end)
+
+            if success then
+                humanoid:ApplyDescription(desc)
+            end
+        end
+    end)()
+end
+
+local function onPlayerAdded(player)
+    player.CharacterAdded:Connect(function(character)
+        wait()
+        onCharacterAdded(character, player)
+    end)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+for _, player in pairs(Players:GetPlayers()) do
+    onPlayerAdded(player)
+end
